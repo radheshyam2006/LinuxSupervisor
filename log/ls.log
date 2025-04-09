@@ -1,0 +1,15 @@
+total 108
+drwxrwxr-x  3 radheshyam radheshyam  4096 Apl  9 21:48 .
+drwxr-x--- 37 radheshyam radheshyam  4096 Apl  8 19:22 ..
+-rwxrwxr-x  1 radheshyam radheshyam 83664 Apl  9 21:48 a.out
+drwxrwxr-x  2 radheshyam radheshyam  4096 Apl  9 21:45 log
+-rw-r--r--  1 radheshyam radheshyam  7122 Apl  9 21:43 main.cpp
+-rw-rw-r--  1 radheshyam radheshyam    29 Apl  9 21:48 tasks.conf
+total 140
+drwxrwxr-x  3 radheshyam radheshyam  4096 Jul  9 23:55 .
+drwxr-x--- 37 radheshyam radheshyam  4096 Jul  9 23:17 ..
+-rwxrwxr-x  1 radheshyam radheshyam 98400 Jul  9 23:55 a.out
+drwxrwxr-x  2 radheshyam radheshyam  4096 Jul  9 21:49 log
+-rw-r--r--  1 radheshyam radheshyam  9228 Jul  9 23:55 main.cpp
+-rw-r--r--  1 radheshyam radheshyam  9227 Jul  9 23:42 README.md
+-rw-rw-r--  1 radheshyam radheshyam    30 Jul  9 23:14 tasks.conf
