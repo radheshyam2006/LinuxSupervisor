@@ -12,6 +12,12 @@ It reads a list of programs to run, launches them, monitors their health, automa
 ┌──────────────────────────────────────────────────────────────────┐
 │                        SUPERVISOR PROCESS                        │
 │                                                                  │
+│  ┌────────────────────────┐                                      │
+│  │      daemonize()       │                                      │
+│  │  Double fork + setsid  │                                      │
+│  │  Redirect I/O to log   │                                      │
+│  └───────────┬────────────┘                                      │
+│              ▼                                                   │
 │  ┌─────────────┐    ┌──────────────────┐    ┌────────────────┐  │
 │  │ tasks.conf  │───▶│  parse_command() │───▶│ launch_task()  │  │
 │  │  sleep 6    │    │  splits command  │    │  pipe()        │  │
@@ -84,6 +90,7 @@ It reads a list of programs to run, launches them, monitors their health, automa
 | `waitpid()` | `on_child_exit()` | Reaps dead children, prevents zombies |
 | `kill()` | `on_shutdown()` | Sends signals to child processes |
 | `signal()` | `main()` | Registers SIGCHLD, SIGINT, SIGTERM handlers |
+| `setsid()` | `daemonize()` | Detaches process from terminal to create a session leader |
 | `read()` | `on_child_exit()` | Drains pipe buffer into log file |
 | `fopen/fscanf` | `get_process_state()` | Reads `/proc/<pid>/stat` for state |
 | `fgets/sscanf` | `get_memory_kb()` | Reads `/proc/<pid>/status` for VmRSS |
@@ -176,10 +183,11 @@ Pattern: SIGTERM first, wait, then SIGKILL if still alive
 
 ### 6. Double Fork Pattern — Daemonization
 ```
-1. fork() and exit parent to return control to the shell.
-2. setsid() to detach from the terminal and become session leader.
-3. fork() again so the daemon can never reacquire a terminal.
-4. Redirect standard I/O (stdin, stdout, stderr) to a log file.
+Linux requires a specific sequence to create a true background daemon:
+1. fork() and exit parent: Returns control to the shell immediately.
+2. setsid(): Child becomes a Session Leader, detaching completely from the terminal.
+3. fork() again: The new child is no longer a session leader, ensuring it can never reacquire a controlling terminal.
+4. Redirect standard I/O: stdin, stdout, and stderr are redirected to a log file (/dev/null usually, but we use log/supervisor.log) so the daemon doesn't crash when trying to print without a terminal.
 ```
 
 
