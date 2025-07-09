@@ -174,4 +174,12 @@ SIGKILL → unconditional termination (cannot be caught)
 Pattern: SIGTERM first, wait, then SIGKILL if still alive
 ```
 
+### 6. Double Fork Pattern — Daemonization
+```
+1. fork() and exit parent to return control to the shell.
+2. setsid() to detach from the terminal and become session leader.
+3. fork() again so the daemon can never reacquire a terminal.
+4. Redirect standard I/O (stdin, stdout, stderr) to a log file.
+```
+
 

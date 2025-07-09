@@ -1,4 +1,5 @@
 #include <cstring>       // strdup()
+#include <fcntl.h>       // open(), O_RDWR
 #include <fstream>       // ifstream (file reading)
 #include <iostream>      // cout, cerr
 #include <sstream>       // stringstream (string splitting)
@@ -201,7 +202,35 @@ void on_shutdown(int sig) {
 // MAIN
 // ─────────────────────────────────────────────
 
+void daemonize() {
+  // Fork 1: parent exits → shell gets its prompt back
+  pid_t pid = fork();
+  if (pid < 0) exit(1);
+  if (pid > 0) exit(0); // parent exits
+
+  // setsid: child becomes a NEW session leader
+  //         detaches from the terminal completely
+  if (setsid() < 0) exit(1);
+
+  // Fork 2: prevents reacquiring a controlling terminal
+  pid = fork();
+  if (pid < 0) exit(1);
+  if (pid > 0) exit(0); // session leader exits
+
+  // Redirect standard I/O to a log file instead of terminal
+  int fd = open("log/supervisor.log", O_RDWR | O_CREAT | O_APPEND, 0666);
+  if (fd >= 0) {
+    dup2(fd, STDIN_FILENO);
+    dup2(fd, STDOUT_FILENO);
+    dup2(fd, STDERR_FILENO);
+    if (fd > 2) close(fd);
+  }
+}
+
 int main() {
+  // Become a true background daemon
+  daemonize();
+
   // Register BEFORE launching any task.
   // A child could die instantly; if handler isn't registered yet, we'd miss it.
   signal(SIGCHLD, on_child_exit);
